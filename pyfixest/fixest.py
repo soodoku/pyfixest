@@ -37,15 +37,15 @@ class Fixest:
         fval_list = fval.split("+")
 
         # find interacted fixed effects via "^"
-        interacted_fes = [x for x in fval_list if len(x.split('^')) > 1]
-            
-        varying_slopes = [x for x in fval_list if len(x.split('/')) > 1]
+        interacted_fes = [x for x in fval_list if '^' in x]
+             
+        varying_slopes = [x for x in fval_list if '/' in x]
 
         for x in interacted_fes:
             vars = x.split("^")
-            data[x] = data[vars].apply(lambda x: '^'.join(
-                x.dropna().astype(str)) if x.notna().all() else np.nan, axis=1)
-        
+            data[x] = data[vars].fillna(method='ffill', axis=1).apply(lambda x: '^'.join(
+                row.dropna().astype(str)), axis=1)
+
         fe = data[fval_list]
         # all fes to factors / categories
 
